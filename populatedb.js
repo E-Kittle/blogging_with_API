@@ -14,6 +14,7 @@ if (!userArgs[0].startsWith('mongodb')) {
 
 const async = require('async');
 const Post = require('./models/post');
+const Comment = require('./models/comment');
 
 // Connect to database
 var mongoose = require('mongoose');
@@ -25,6 +26,7 @@ db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 
 // Create an array of posts 
 const posts = [];
+const comments = [];
 
 
 // Function to create a post
@@ -70,8 +72,63 @@ function createPosts(cb) {
     cb);
 }
 
+// Loading for the comments
+function commentCreate(username, comment, post, cb) {
+    let today = new Date();
+    let date = today.toDateString();
+
+    commentDetail = {
+        username: username,
+        comment: comment,
+        date: date,
+        post: post,
+    }
+
+    let newComment = new Comment(commentDetail);
+
+    newComment.save(function (err) {
+        if(err) {
+            cb(err, null);
+            return;
+        }
+        else {
+            console.log('new Comment: ' +newComment);
+            comments.push(newComment);
+            cb(null, post);
+        }
+    })
+}
+
+function createComments(cb) {
+    async.series([
+        function(callback) {
+            commentCreate('user1', 'A harsh comment', posts[1]._id, callback);
+        },
+        function(callback) {
+            commentCreate('user2', 'A nice comment', posts[1]._id, callback);
+        },
+        function(callback) {
+            commentCreate('user1', 'A harsh comment', posts[2]._id, callback);
+        },
+        function(callback) {
+            commentCreate('user2', 'A brutal comment', posts[2]._id, callback);
+        },
+        function(callback) {
+            commentCreate('user1', 'A harsh comment', posts[3]._id, callback);
+        },
+        function(callback) {
+            commentCreate('user2', 'A exhausted comment', posts[3]._id, callback);
+        },
+        function(callback) {
+            commentCreate('user3', 'A harsh comment', posts[0]._id, callback);
+        },  
+    ]
+    ,cb);
+}
+
 async.series([
     createPosts,
+    createComments,
 ],
 function(err, results) {
     if(err){

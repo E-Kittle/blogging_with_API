@@ -22,6 +22,8 @@ router.put('/posts/:postid', postController.posts_edit_post);
 
 router.delete('/posts/:postid', postController.posts_delete_post);
 
+// Router to get comments for a specific post
+router.get('/posts/:postid/comments', commentController.comments_get);
 
 // Router to create a comment for a specific post
 router.post('/posts/:postid/comments', commentController.comments_create);

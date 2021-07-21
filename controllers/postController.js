@@ -155,7 +155,7 @@ exports.posts_delete_post = function (req, res, next) {
         }
         else if (err) { return next(err); }
         else {
-            Post.findByIdAndRemove(req.params.id, function deletePost(err) {
+            Post.findByIdAndDelete(req.params.postid, function deletePost(err) {
                 if (err) { return next(err); }
                 else {
                     res.status(200).json({ message: `Post deleted` })
