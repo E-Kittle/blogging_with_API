@@ -3,11 +3,21 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+const mongoose = require('mongoose');
 
-const postRouter = require('./routes/post');
-const commentRouter = require('./routes/comment');
+const routes = require('./routes/index');
 
 var app = express();
+
+// Import environmental variables
+require('dotenv').config();
+
+
+// Connect to database
+mongoose.connect(process.env.DB_URL, { useUnifiedTopology: true, useNewUrlParser: true});
+const db = mongoose.connection;
+db.on('error', console.error.bind(console, "mongo connection error"));
+
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -20,8 +30,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/api', postRouter);
-app.use('/api', commentRouter);
+app.use('/api', routes);
 
 
 // catch 404 and forward to error handler
