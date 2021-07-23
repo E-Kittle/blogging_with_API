@@ -37,8 +37,7 @@ exports.posts_create = [
 
             /*
             This is what the errArr would look like for the client
-                {
-                    "errArr": [
+                { "errArr": [
                         {
                             "msg": "Title is required",
                             "param": "title",
@@ -49,8 +48,7 @@ exports.posts_create = [
                             "param": "content",
                             "location": "body"
                         }
-                    ]
-                }
+                    ] }
             */
         }
 
