@@ -15,6 +15,7 @@ if (!userArgs[0].startsWith('mongodb')) {
 const async = require('async');
 const Post = require('./models/post');
 const Comment = require('./models/comment');
+const Admin = require('./models/admin');
 
 // Connect to database
 var mongoose = require('mongoose');
@@ -28,6 +29,30 @@ db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 const posts = [];
 const comments = [];
 
+
+// Function to create an admin
+function adminCreate(username, password, cb) {
+    userDetail = {username:username, password:password};
+    let user = new Admin(userDetail);
+    user.save(function (err) {
+        if (err) {
+            cb(err, null);
+            return;    
+        }
+        else {
+            console.log('successfully created admin');
+            cb(null, user);
+        }
+    })
+}
+
+function createAdmin(cb) {
+    async.series([
+        function(callback) {
+            adminCreate('monster', 'monsteraspass', callback)
+        }
+    ], cb)
+}
 
 // Function to create a post
 function postCreate(title, content, published, cb) {
@@ -129,6 +154,7 @@ function createComments(cb) {
 async.series([
     createPosts,
     createComments,
+    createAdmin
 ],
 function(err, results) {
     if(err){

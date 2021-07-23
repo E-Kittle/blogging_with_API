@@ -17,8 +17,8 @@ exports.comments_get = function(req, res, next) {
     })
 }
 
-exports.comments_create = function(req, res, next) {
 
+exports.comments_create = [
     // Validate and sanitize data
     //name, comment, date, post (which post it's referencing)
     body('name').escape().trim(),
@@ -38,6 +38,10 @@ exports.comments_create = function(req, res, next) {
             let today = new Date();
             let date = today.toDateString();
 
+            if (req.body.name === '') {
+                req.body.name='Guest';
+            }
+
             let newComment = new Comment(
                 {
                     name: req.body.name,
@@ -52,7 +56,8 @@ exports.comments_create = function(req, res, next) {
         }
 
     }
-}
+]
+
 
 exports.comment_delete = function(req, res, next) {
     Comment.findById(req.params.commentid, function (err, comment) {

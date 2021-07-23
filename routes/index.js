@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 const postController = require('../controllers/postController');
 const commentController = require('../controllers/commentController');
+const adminController = require('../controllers/adminController');
 
 /* GET home page. */
 router.get('/', function(req, res) {
@@ -30,5 +31,14 @@ router.post('/posts/:postid/comments', commentController.comments_create);
 
 // Route to delete a post under a specific comment - ADMIN only
 router.delete('/posts/:postid/comments/:commentid', commentController.comment_delete);
+
+
+// Routes for the admin
+router.post('/admin/login', adminController.loginAdmin);
+
+router.post('/admin/logout', adminController.logoutAdmin);
+
+router.post('/admin/create', adminController.createAdmin);
+
 
 module.exports = router;

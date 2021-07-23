@@ -4,6 +4,7 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 const mongoose = require('mongoose');
+require('./managers/passport');      //Require the custom LocalStrategy
 
 const routes = require('./routes/index');
 
