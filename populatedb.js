@@ -1,16 +1,11 @@
 #! /usr/bin/env node
 
-console.log('This script populates test posts');
+// This script populates the db with test data
+console.log('This script populates test posts, comments, and an admin');
 
 // Get arguments passed on command line
 var userArgs = process.argv.slice(2);
 
-/*
-if (!userArgs[0].startsWith('mongodb')) {
-    console.log('ERROR: You need to specify a valid mongodb URL as the first argument');
-    return
-}
-*/
 
 const async = require('async');
 const Post = require('./models/post');
@@ -32,6 +27,7 @@ const comments = [];
 
 
 // Function to create an admin
+// Admin test data will be removed from the database in production
 function adminCreate(username, password, cb) {
 
     bcrypt.hash(password, 10, (err, hashedPassword) => {
@@ -50,10 +46,11 @@ function adminCreate(username, password, cb) {
     })
 }
 
+// Admin test data will be removed from the db in production
 function createAdmin(cb) {
     async.series([
         function(callback) {
-            adminCreate('monster', 'monsteraspass', callback)
+            adminCreate('removed', 'removed', callback)
         }
     ], cb)
 }
@@ -80,6 +77,7 @@ function postCreate(title, content, published, cb) {
     });
 }
 
+// Loads the db with posts
 function createPosts(cb) {
     async.series([
         function(callback) {
@@ -101,7 +99,7 @@ function createPosts(cb) {
     cb);
 }
 
-// Loading for the comments
+// Function to create the comments in the db
 function commentCreate(name, comment, post, cb) {
     let today = new Date();
     let date = today.toDateString();
@@ -128,6 +126,7 @@ function commentCreate(name, comment, post, cb) {
     })
 }
 
+// Loads the db with comments
 function createComments(cb) {
     async.series([
         function(callback) {

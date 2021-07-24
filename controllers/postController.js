@@ -2,9 +2,22 @@ const Post = require('../models/post');
 const { body, validationResult } = require('express-validator');
 
 
-// Function to get the posts - We can also add a query parameter to the URL
-// if we want to allow the user to sort the results
+// Function to get the published posts
 exports.posts_get = function (req, res, next) {
+    // Grabs only published posts from the database
+    Post.find({published: true})
+        .exec(function (err, post_list) {
+            if (err) { return next(err); }
+            else {      //Successful data grab
+                res.status(200).json(post_list);
+            }
+        })
+}
+
+// This function grabs all of the posts (published and not published)
+// From the db - Admin only
+exports.posts_get_protected = function (req, res, next) {
+    // Grabs all posts from the database
     Post.find()
         .exec(function (err, post_list) {
             if (err) { return next(err); }
@@ -14,46 +27,22 @@ exports.posts_get = function (req, res, next) {
         })
 }
 
-
+// Function to create a new post - Admin only
 exports.posts_create = [
+
+    // Validate and sanitize the data
     body('title', 'Title is required').isLength({ min: 1 }).escape().trim(),
     body('content', 'Content is required').isLength({ min: 1 }).escape().trim(),
     body('published').toBoolean(),
 
     (req, res, next) => {
-        console.log('worked here')
-        const errors = validationResult(req);
-
         // If there were errors, reject the submission and return the errors
+        const errors = validationResult(req);
         if (!errors.isEmpty()) {
-
-            // Do we do this on the backend or allow them to handle it on the frontend?
-            const post = {
-                title: req.body.title,
-                content: req.body.content
-            }
-
-
             res.status(400).json({ errArr: errors.array() })
-
-            /*
-            This is what the errArr would look like for the client
-                { "errArr": [
-                        {
-                            "msg": "Title is required",
-                            "param": "title",
-                            "location": "body"
-                        },
-                        {
-                            "msg": "Content is required",
-                            "param": "content",
-                            "location": "body"
-                        }
-                    ] }
-            */
         }
 
-        // There were no errors 
+        // There were no errors so create the new post and save it to the database
         else {
             let today = new Date();
             let date = today.toDateString();
@@ -69,19 +58,21 @@ exports.posts_create = [
                 if (err) { return next(err); }
                 res.status(200).json(result);
             })
-
-
         }
     }
 ]
 
-// Displays a post and makes sure it exists
+// Returns the data for a specific post
 exports.posts_get_post = function (req, res, next) {
+
+    // First, check if the post exists
     Post.findById(req.params.postid, function (err, post) {
         if (post === undefined) {
             res.status(404).json({ message: 'No such post exists' })
         }
         else if (err) { return next(err); }
+
+        // Return the post to the user
         else {
             res.status(200).json(post)
         }
@@ -89,18 +80,23 @@ exports.posts_get_post = function (req, res, next) {
 }
 
 
-
+// Function to edit a post
 exports.posts_edit_post = [
+
+    // Validate and sanitize the fields
     body('title', 'Title is required').isLength({ min: 1 }).escape().trim(),
     body('content', 'Content is required').isLength({ min: 1 }).escape().trim(),
     body('published').toBoolean(),
 
     (req, res, next) => {
+
+        // Extract validation errors
         const errors = validationResult(req);
 
+        // Ensure the original post exists
         Post.findById(req.params.postid, function (err, post) {
 
-            if (post === undefined) {
+            if (post === undefined) {       //If no such post, return a 404 error
                 res.status(404).json({ message: 'No post found' })
             }
             // Forward error from findById to next middleware
@@ -141,18 +137,17 @@ exports.posts_edit_post = [
     },
 ]
 
-// END OF EDITS
-
-
-
-
-
+// Function delete a post
 exports.posts_delete_post = function (req, res, next) {
+
+    // Checks if the post id from the url parameter exists
     Post.findById(req.params.postid, function (err, post) {
         if (post === undefined) {
             res.status(404).json({ message: 'No such post exists' })
         }
         else if (err) { return next(err); }
+
+        // post exists and no errors, so delete the post
         else {
             Post.findByIdAndDelete(req.params.postid, function deletePost(err) {
                 if (err) { return next(err); }

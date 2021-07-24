@@ -3,6 +3,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
+// Schema for the Admin - Password is protected by bcrypt
 let AdminSchema = new Schema(
     {
         username: {type: String, required: true, unique: true},

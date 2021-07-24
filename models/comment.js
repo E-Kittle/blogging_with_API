@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
+// Schema for the comments
 let CommentSchema = new Schema(
     {
         name: {type: String, required: false, maxLength: 30, default: 'Guest'},

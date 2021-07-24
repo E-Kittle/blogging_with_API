@@ -3,13 +3,15 @@ const ExtractJwt = require('passport-jwt').ExtractJwt;
 const passport = require('passport');
 const Admin = require('../models/admin');
 
+// Require the dotenv file for the secret
 require('dotenv').config();
 
+// Set the options object for the JwtStrategy
 let opts = {}
 opts.secretOrKey =  process.env.SECRET;
 opts.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
 
-
+// Create the new JwtStrategy to check if the user has an active token for the db
 passport.use(new JwtStrategy(opts, function(jwt_payload, done) {
     Admin.findOne({id: jwt_payload.sub}, function(err, user) {
 
