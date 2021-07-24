@@ -7,32 +7,28 @@ require('dotenv').config();
 
 
 exports.loginAdmin = function (req, res, next) {
-    passport.authenticate('local', { session: false }, (err, user, info) => {
-        console.log('in auth')
-        // console.log(user);
-        if (err || !user) {
-            // console.log(user)
-            return res.status(400).json({
-                message: "Something is not right",
-                user: user
-            });
+    let { username, password } = req.body;
+
+    // Query database to see if user exists
+    Admin.findOne({ username, password })
+    .then(user => {
+        if (!user) {
+            return res.status(400).json({ message: 'Incorrect email or password.' });
         }
-        else {
-            // req.login(user, { session: false }, (err) => {
-            //     if (err) {
-            //         res.send(err);
-            //     }
-                
-                // Everything worked. Create a json web token with the contents of the user object
-                // and return it in the response
-                const token = jwt.sign(user, process.env.SECRET);
-                
-                console.log('logged in');
-                
-                return res.json({ user, token });
-            }
-        
-    })(req, res);
+        else{
+            // Authentication passed. Create the token and return
+            // it to the client
+            const opts = {};
+            opts.expiresIn = 60*60;
+            const secret = process.env.SECRET;
+                // Should we create a custom user? This is returning the password too
+            const token = jwt.sign({user}, secret, opts);
+            return res.status(200).json({
+                message: 'Authentication Passed',
+                token
+            })
+        }
+    })
 };
 
 exports.logoutAdmin = function (req, res, next) {

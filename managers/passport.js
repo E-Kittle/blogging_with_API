@@ -1,40 +1,33 @@
+const JwtStrategy = require('passport-jwt').Strategy;
+const ExtractJwt = require('passport-jwt').ExtractJwt;
 const passport = require('passport');
-const LocalStrategy = require('passport-local').Strategy;
-const passportJWT = require("passport-jwt");
-const JWTStrategy = passportJWT.Strategy;
-const ExtractJWT = passportJWT.ExtractJwt;
 const Admin = require('../models/admin');
 
 require('dotenv').config();
 
-passport.use(
-    new LocalStrategy((username, password, cb) => {
-        console.log('triggered');
-        // console.log(`username: ${username}, password: ${password}`)
-        Admin.findOne({ username, password })
-            .then(user => {
-                if (!user) {
-                    return cb(null, false, { message: 'Incorrect email or password.' });
-                }
-                else{
-                    return cb(null, user, { message: 'Logged In Successfully' });
-                }
-            })
-            .catch(err => cb(err));
-    }
-    ));
+let opts = {}
+opts.secretOrKey =  process.env.SECRET;
+opts.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
 
-passport.use(new JWTStrategy({
-    jwtFromRequest: ExtractJWT.fromAuthHeaderAsBearerToken(),
-    secretOrKey: process.env.SECRET
-},
-function(jwtPayload, cb) {
-        return User.findOneById(jwtPayload.id)
-        .then(user => {
-            return cb(null, user);
-        })
-        .catch(err => {
-            return cb(err);
-        })
-    }
-))
+
+passport.use(new JwtStrategy(opts, function(jwt_payload, done) {
+    console.log(jwt_payload);
+    Admin.findOne({id: jwt_payload.sub}, function(err, user) {
+
+        // If there is an error, return the error
+        if (err) {
+            return done(err, false);
+        }
+        // If token passed authentication, let the routeController handle it
+        if (user) {
+            return done(null, user);
+        }
+            // User failed authentication, return a 401: unauthorized status
+        else {
+            return done(null, false);
+        }
+    });
+}));
+
+
+

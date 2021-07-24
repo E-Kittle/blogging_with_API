@@ -3,6 +3,7 @@ var router = express.Router();
 const postController = require('../controllers/postController');
 const commentController = require('../controllers/commentController');
 const adminController = require('../controllers/adminController');
+const passport = require('passport');
 
 /* GET home page. */
 router.get('/', function(req, res) {
@@ -40,5 +41,8 @@ router.post('/admin/logout', adminController.logoutAdmin);
 
 router.post('/admin/create', adminController.createAdmin);
 
+router.get("/admin/protected", passport.authenticate('jwt', { session: false }), (req, res) => {
+  return res.status(200).json( {message: "YAY! this is a protected Route"} )
+})
 
 module.exports = router;
