@@ -1,6 +1,7 @@
 {
   "name": "blogging-with-api",
   "version": "0.0.0",
+  "engines": { "node": "15.8.0" },
   "private": true,
   "scripts": {
     "start": "node ./bin/www",
