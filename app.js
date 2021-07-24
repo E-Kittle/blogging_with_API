@@ -7,7 +7,7 @@ const mongoose = require('mongoose');
 
 
 // Authentication middleware
-require('./managers/passport');      //Require the custom LocalStrategy
+require('./managers/passport');      //Require the custom jwt strategy
 
 
 var app = express();
@@ -17,7 +17,7 @@ require('dotenv').config();
 
 
 // Connect to database
-mongoose.connect(process.env.DB_URL, { useUnifiedTopology: true, useNewUrlParser: true});
+mongoose.connect(process.env.DB_URL, { useUnifiedTopology: true, useNewUrlParser: true, useFindAndModify: false, useCreateIndex: true});
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, "mongo connection error"));
 

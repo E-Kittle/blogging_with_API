@@ -16,6 +16,7 @@ const async = require('async');
 const Post = require('./models/post');
 const Comment = require('./models/comment');
 const Admin = require('./models/admin');
+const bcrypt = require('bcrypt');
 
 // Connect to database
 var mongoose = require('mongoose');
@@ -32,17 +33,20 @@ const comments = [];
 
 // Function to create an admin
 function adminCreate(username, password, cb) {
-    userDetail = {username:username, password:password};
-    let user = new Admin(userDetail);
-    user.save(function (err) {
-        if (err) {
-            cb(err, null);
-            return;    
-        }
-        else {
-            console.log('successfully created admin');
-            cb(null, user);
-        }
+
+    bcrypt.hash(password, 10, (err, hashedPassword) => {
+        let userDetail = {username, password:hashedPassword};
+
+        let user = new Admin(userDetail);
+        user.save(function (err) {
+            if (err) {
+                cb(err, null);
+                return;    
+            }
+            else {
+                cb(null, user);
+            }
+        })
     })
 }
 
@@ -98,12 +102,12 @@ function createPosts(cb) {
 }
 
 // Loading for the comments
-function commentCreate(username, comment, post, cb) {
+function commentCreate(name, comment, post, cb) {
     let today = new Date();
     let date = today.toDateString();
 
     commentDetail = {
-        username: username,
+        name: name,
         comment: comment,
         date: date,
         post: post,

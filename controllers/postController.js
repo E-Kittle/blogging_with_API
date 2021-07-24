@@ -21,6 +21,7 @@ exports.posts_create = [
     body('published').toBoolean(),
 
     (req, res, next) => {
+        console.log('worked here')
         const errors = validationResult(req);
 
         // If there were errors, reject the submission and return the errors
@@ -52,7 +53,7 @@ exports.posts_create = [
             */
         }
 
-        // There were no errors save the post
+        // There were no errors 
         else {
             let today = new Date();
             let date = today.toDateString();

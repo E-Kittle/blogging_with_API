@@ -12,37 +12,33 @@ router.get('/', function(req, res) {
 
 
 // Routes for all posts
-router.get('/posts', postController.posts_get);
+  router.get('/posts', postController.posts_get);
 
-router.post('/posts', postController.posts_create);
+  //Route for creating a new post - must be admin 
+  router.post('/posts', passport.authenticate('jwt', { session: false }), postController.posts_create);
+
 
 
 // Routes for specific posts
-router.get('/posts/:postid', postController.posts_get_post);
+  router.get('/posts/:postid', postController.posts_get_post);
 
-router.put('/posts/:postid', postController.posts_edit_post);
+  //Route for editting a post - Must be admin
+  router.put('/posts/:postid', passport.authenticate('jwt', { session: false }), postController.posts_edit_post);
 
-router.delete('/posts/:postid', postController.posts_delete_post);
+  //Route for deleting a post - must be admin
+  router.delete('/posts/:postid', passport.authenticate('jwt', { session: false }), postController.posts_delete_post);
 
 // Router to get comments for a specific post
-router.get('/posts/:postid/comments', commentController.comments_get);
+  router.get('/posts/:postid/comments', commentController.comments_get);
 
 // Router to create a comment for a specific post
-router.post('/posts/:postid/comments', commentController.comments_create);
+  router.post('/posts/:postid/comments', commentController.comments_create);
 
 // Route to delete a post under a specific comment - ADMIN only
-router.delete('/posts/:postid/comments/:commentid', commentController.comment_delete);
+router.delete('/posts/:postid/comments/:commentid', passport.authenticate('jwt', { session: false }), commentController.comment_delete);
 
 
 // Routes for the admin
 router.post('/admin/login', adminController.loginAdmin);
-
-router.post('/admin/logout', adminController.logoutAdmin);
-
-router.post('/admin/create', adminController.createAdmin);
-
-router.get("/admin/protected", passport.authenticate('jwt', { session: false }), (req, res) => {
-  return res.status(200).json( {message: "YAY! this is a protected Route"} )
-})
 
 module.exports = router;

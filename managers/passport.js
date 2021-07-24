@@ -11,7 +11,6 @@ opts.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
 
 
 passport.use(new JwtStrategy(opts, function(jwt_payload, done) {
-    console.log(jwt_payload);
     Admin.findOne({id: jwt_payload.sub}, function(err, user) {
 
         // If there is an error, return the error
