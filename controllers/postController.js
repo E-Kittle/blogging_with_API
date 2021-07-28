@@ -15,7 +15,7 @@ exports.posts_get = function (req, res, next) {
 }
 
 // This function grabs all of the posts (published and not published)
-// From the db - Admin only
+// From the db - user only
 exports.posts_get_protected = function (req, res, next) {
     // Grabs all posts from the database
     Post.find()
@@ -27,7 +27,7 @@ exports.posts_get_protected = function (req, res, next) {
         })
 }
 
-// Function to create a new post - Admin only
+// Function to create a new post - user only
 exports.posts_create = [
 
     // Validate and sanitize the data

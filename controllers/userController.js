@@ -1,4 +1,4 @@
-const Admin = require('../models/admin');
+const User = require('../models/user');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const { body, validationResult } = require('express-validator');
@@ -7,11 +7,11 @@ const { body, validationResult } = require('express-validator');
 require('dotenv').config();
 
 
-exports.loginAdmin = function (req, res, next) {
+exports.loginUser = function (req, res, next) {
     let { username, password } = req.body;
 
     // Query database to see if user exists
-    Admin.findOne({ username })
+    User.findOne({ username })
         .then(user => {
             if (!user) {
                 return res.status(400).json({ message: 'Incorrect email or password.' });
@@ -40,11 +40,12 @@ exports.loginAdmin = function (req, res, next) {
         })
 };
 
-// Method to create a new admin
-exports.admin_create = [
+// Method to create a new user
+exports.user_create = [
     // Validate and sanitize data
     body('username', 'Username is required').escape().trim().isLength({ min: 3 }).withMessage('Min length is 3 characters'),
     body('password', 'Password is required').isLength({ min: 8 }).escape().trim().withMessage('Minimum password length is 8 characters'),
+    body('email', 'Email is required').escape().trim().isLength({ min: 3 }).withMessage('Min length is 3 characters'),
 
     (req, res, next) => {
         // Extract errors from validation
@@ -54,19 +55,21 @@ exports.admin_create = [
         if (!errors.isEmpty()) {
             res.status(400).json({ errArr: errors.array() });
         }
-        // There are no errors, save the admin
+        // There are no errors, save the user
         else {
             // Hash the password
             bcrypt.hash(req.body.password, 10, (err, hashedPassword) => {
                 let userDetail = {
                     username: req.body.username,
-                    password: hashedPassword
+                    password: hashedPassword,
+                    email: req.body.email,
+                    admin: req.body.admin
                 };
         
-                let user = new Admin(userDetail);
+                let user = new User(userDetail);
                 user.save((err, result) => {
                     if (err) { return next(err); }
-                    res.status(200).json({'Message': 'Admin Created'})
+                    res.status(200).json({'Message': 'user Created'})
                 });
             });
         }

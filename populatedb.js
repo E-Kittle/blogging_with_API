@@ -1,7 +1,7 @@
 #! /usr/bin/env node
 
 // This script populates the db with test data
-console.log('This script populates test posts, comments, and an admin');
+console.log('This script populates test posts, comments, and an user');
 
 // Get arguments passed on command line
 var userArgs = process.argv.slice(2);
@@ -10,7 +10,7 @@ var userArgs = process.argv.slice(2);
 const async = require('async');
 const Post = require('./models/post');
 const Comment = require('./models/comment');
-const Admin = require('./models/admin');
+const User = require('./models/user');
 const bcrypt = require('bcrypt');
 
 // Connect to database
@@ -26,14 +26,14 @@ const posts = [];
 const comments = [];
 
 
-// Function to create an admin
-// Admin test data will be removed from the database in production
-function adminCreate(username, password, cb) {
+// Function to create an user
+// user test data will be removed from the database in production
+function userCreate(username, password, cb) {
 
     bcrypt.hash(password, 10, (err, hashedPassword) => {
         let userDetail = {username, password:hashedPassword};
 
-        let user = new Admin(userDetail);
+        let user = new User(userDetail);
         user.save(function (err) {
             if (err) {
                 cb(err, null);
@@ -46,11 +46,11 @@ function adminCreate(username, password, cb) {
     })
 }
 
-// Admin test data will be removed from the db in production
-function createAdmin(cb) {
+// user test data will be removed from the db in production
+function createuser(cb) {
     async.series([
         function(callback) {
-            adminCreate('removed', 'removed', callback)
+            userCreate('removed', 'removed', callback)
         }
     ], cb)
 }
@@ -157,7 +157,7 @@ function createComments(cb) {
 async.series([
     createPosts,
     createComments,
-    createAdmin
+    createuser
 ],
 function(err, results) {
     if(err){
