@@ -36,10 +36,15 @@ router.delete('/posts/:postid/comments/:commentid', passport.authenticate('jwt',
 
 
 // Routes for the user
-router.post('/user/login', userController.loginUser);
+router.post('/auth/login', userController.loginUser);
 
 // Route to create a new user
 // Only an existing user can create a new user
-router.post('/user/signup', userController.user_create);
+router.post('/auth/signup', userController.user_create);
+
+router.get('/auth/protected-test', passport.authenticate('jwt', { session: false }), (req, res) => {
+    res.end('Protected route reached')
+});
+
 // router.post('/user/sign-up', passport.authenticate('jwt', {session: false}), userController.user_create);  - Depreciated
 module.exports = router;
