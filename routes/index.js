@@ -42,7 +42,7 @@ router.post('/auth/login', userController.loginUser);
 router.post('/auth/signup', userController.user_create);
 
 // Route for general authorization
-router.post('/auth/userAuth', passport.authenticate('jwt', { session: false }),userController.authorizeUser);
+router.get('/auth/userAuth', passport.authenticate('jwt', { session: false }),userController.authorizeUser);
 
 router.get('/auth/protected-test', passport.authenticate('jwt', { session: false }), (req, res) => {
     res.end('Protected route reached')
