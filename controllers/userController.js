@@ -6,6 +6,11 @@ const { body, validationResult } = require('express-validator');
 // Import environmental variables - For jwt secret
 require('dotenv').config();
 
+exports.authorizeUser = function(req, res, next) {
+    return res.status(200).json({ user:req.user });
+}
+
+
 
 exports.loginUser = function (req, res, next) {
     let { username, password } = req.body;

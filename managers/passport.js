@@ -22,7 +22,6 @@ passport.use(new JwtStrategy(opts, function(jwt_payload, done) {
             admin: returnedUser.admin
         }
 
-        console.log(user);
         // If there is an error, return the error
         if (err) {
             return done(err, false);

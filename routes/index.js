@@ -39,8 +39,10 @@ router.delete('/posts/:postid/comments/:commentid', passport.authenticate('jwt',
 router.post('/auth/login', userController.loginUser);
 
 // Route to create a new user
-// Only an existing user can create a new user
 router.post('/auth/signup', userController.user_create);
+
+// Route for general authorization
+router.post('/auth/userAuth', passport.authenticate('jwt', { session: false }),userController.authorizeUser);
 
 router.get('/auth/protected-test', passport.authenticate('jwt', { session: false }), (req, res) => {
     res.end('Protected route reached')
