@@ -26,9 +26,18 @@ exports.loginUser = function (req, res, next) {
                         opts.expiresIn = 60 * 60;
                         const secret = process.env.SECRET;
                         const token = jwt.sign({ user }, secret, opts);
+
+                        // User data to send back to the frontend
+                        const newUser = {
+                            username:user.username,
+                            email:user.email,
+                            admin:user.admin
+                        }
+
                         return res.status(200).json({
                             message: 'Authentication Successful',
-                            token
+                            token,
+                            user:newUser
                         })
                     }
                     else {
