@@ -41,6 +41,8 @@ router.post('/auth/login', userController.loginUser);
 // Route to create a new user
 router.post('/auth/signup', userController.user_create);
 
+router.get('/user/:id/profile', userController.get_profile);
+
 // Route for general authorization
 router.get('/auth/userAuth', passport.authenticate('jwt', { session: false }),userController.authorizeUser);
 

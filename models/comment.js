@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 // Schema for the comments
 let CommentSchema = new Schema(
     {
-        name: {type: String, required: false, maxLength: 30, default: 'Guest'},
+        author: {type: Schema.Types.ObjectId, ref: 'user'},
         comment: {type: String, required: true, maxLength: 300},
         date: {type: Date, required: true},
         post: {type: Schema.Types.ObjectId, ref: 'post', required: true}

@@ -1,13 +1,16 @@
 const User = require('../models/user');
+const Comment = require('../models/comment');
+const Post = require('../models/post');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
+const async = require('async');
 const { body, validationResult } = require('express-validator');
 
 // Import environmental variables - For jwt secret
 require('dotenv').config();
 
-exports.authorizeUser = function(req, res, next) {
-    return res.status(200).json({ user:req.user });
+exports.authorizeUser = function (req, res, next) {
+    return res.status(200).json({ user: req.user });
 }
 
 
@@ -34,15 +37,15 @@ exports.loginUser = function (req, res, next) {
 
                         // User data to send back to the frontend
                         const newUser = {
-                            username:user.username,
-                            email:user.email,
-                            admin:user.admin
+                            username: user.username,
+                            email: user.email,
+                            admin: user.admin
                         }
 
                         return res.status(200).json({
                             message: 'Authentication Successful',
                             token,
-                            user:newUser
+                            user: newUser
                         })
                     }
                     else {
@@ -79,13 +82,39 @@ exports.user_create = [
                     email: req.body.email,
                     admin: req.body.admin
                 };
-        
+
                 let user = new User(userDetail);
                 user.save((err, result) => {
                     if (err) { return next(err); }
-                    res.status(200).json({'Message': 'user Created'})
+                    res.status(200).json({ 'Message': 'user Created' })
                 });
             });
         }
     }
 ]
+
+exports.get_profile = function (req, res, next) {
+
+    async.parallel({
+        user: function (callback) {
+            User.findById(req.params.id, callback)
+        },
+        comments: function (callback) {
+            Comment.find({ 'author': req.params.id }, callback)
+        }, function(err, results) {
+            console.log(err.message)
+            if (err) { return next(err); }
+            console.log('made it')
+            console.log(results)
+            res.json(results)
+
+        }
+    })
+
+
+    /*
+    1 - grab user data based on url
+    2 - Grab all comments
+    3 - If admin, grab posts
+    */
+};
