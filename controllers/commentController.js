@@ -2,39 +2,39 @@ const Comment = require('../models/comment');
 const { body, validationResult } = require('express-validator');
 
 // Gets all comments related to the postid from the database
-exports.comments_get = function(req, res, next) {
-    Comment.find({post: req.params.postid})
-    .populate('author', 'username')
-    .exec(function (err, comment_list) {
-        if (err) { return next(err); }
+exports.comments_get = function (req, res, next) {
+    Comment.find({ post: req.params.postid })
+        .populate('author', 'username')
+        .exec(function (err, comment_list) {
+            if (err) { return next(err); }
 
-        // There are no comments for the specific post so return an empty array
-        if (comment_list === null) {
-            comment_list = [];
-            res.status(200).json({comments:comment_list, message:'No comments for this blog post'});
-        }
+            // There are no comments for the specific post so return an empty array
+            if (comment_list === null) {
+                comment_list = [];
+                res.status(200).json({ comments: comment_list, message: 'No comments for this blog post' });
+            }
 
-        // Successfully found comments, return to client
-        else {
-            res.status(200).json({comments:comment_list});
-        }
-    })
+            // Successfully found comments, return to client
+            else {
+                res.status(200).json({ comments: comment_list });
+            }
+        })
 }
 
 
 // Create a new comment
 exports.comments_create = [
     // Validate and sanitize data
-    body('name').escape().trim(),
+    body('author').escape().trim(),
     body('comment', 'Content is required').isLength({ min: 1 }).escape().trim(),
 
     (req, res, next) => {
         // Extract errors from validation
         const errors = validationResult(req);
-        
+
         // If there are errors, handle them
-        if(!errors.isEmpty()) {
-            res.status(400).json({errArr: errors.array() });
+        if (!errors.isEmpty()) {
+            res.status(400).json({ errArr: errors.array() });
         }
         // There are no errors, save the comment
         else {
@@ -43,29 +43,40 @@ exports.comments_create = [
             let date = today.toDateString();
 
             // Check if the user entered a name (not required) for their comment
-            if (req.body.name === '') {
-                req.body.name='Guest';
-            }
+            if (req.body.author === '') {
+                // Create a new comment and save it to the database
+                let newComment = new Comment(
+                    {
+                        comment: req.body.comment,
+                        date: date,
+                        post: req.params.postid
+                    }
+                ).save((err, result) => {
+                    if (err) { return next(err); }
+                    res.status(200).json(result)
+                })
+            } else {
 
-            // Create a new comment and save it to the database
-            let newComment = new Comment(
-                {
-                    name: req.body.name,
-                    comment: req.body.comment,
-                    date: date,
-                    post: req.params.postid
-                }
-            ).save((err, result) => {
-                if (err) { return next(err); }
-                res.status(200).json(result)
-            })
+                // Create a new comment and save it to the database
+                let newComment = new Comment(
+                    {
+                        author: req.body.author,
+                        comment: req.body.comment,
+                        date: date,
+                        post: req.params.postid
+                    }
+                ).save((err, result) => {
+                    if (err) { return next(err); }
+                    res.status(200).json(result)
+                })
+            }
         }
 
     }
 ]
 
 // Function to delete a comment
-exports.comment_delete = function(req, res, next) {
+exports.comment_delete = function (req, res, next) {
 
     // Check if the comment specified by the url paramenter exists
     Comment.findById(req.params.commentid, function (err, comment) {

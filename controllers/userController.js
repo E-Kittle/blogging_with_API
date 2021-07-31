@@ -95,15 +95,20 @@ exports.user_create = [
 
 exports.get_profile = function (req, res, next) {
 
+
     async.parallel({
         user: function (callback) {
             User.findById(req.params.id, callback)
         },
         comments: function (callback) {
-            Comment.find({ author: req.params.id }, callback)
+            Comment.find({ author: req.params.id},'_id comment date post').populate('post', 'title published').exec(callback)
         }}, function(err, results) {
+            if (results.user === undefined || results.user === null) {
+                // No user found with that id
+                res.status(400).json({user: null, message: 'No user with provided id exists'})
+            } else{
+                
             if (err) { return next(err); }
-            
             let user = {
                 id: results.user._id,
                 username: results.user.username,
@@ -117,7 +122,7 @@ exports.get_profile = function (req, res, next) {
                 // send a query that allows the db pull to return only
                 // published queries
                 if (req.query.allposts === 'true') { //Client wants all posts 
-                    Post.find({author: req.params.id})
+                    Post.find({author: req.params.id}, ' title content date')
                     .exec((err, posts) => {
                         if (err) { return next(err) }
                         let result = {comments: results.comments, user: user, posts: posts}
@@ -138,7 +143,7 @@ exports.get_profile = function (req, res, next) {
                 res.status(200).json(result);
             }
 
-        }
+        }}
     )
 
 };

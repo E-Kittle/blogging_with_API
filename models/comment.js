@@ -7,7 +7,7 @@ let CommentSchema = new Schema(
         author: {type: Schema.Types.ObjectId, ref: 'User', default: null},
         comment: {type: String, required: true, maxLength: 300},
         date: {type: Date, required: true},
-        post: {type: Schema.Types.ObjectId, ref: 'post', required: true}
+        post: {type: Schema.Types.ObjectId, ref: 'Post', required: true}
     }
 )
 

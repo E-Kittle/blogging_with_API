@@ -36,6 +36,8 @@ router.post('/auth/login', userController.loginUser);
 // Route to create a new user
 router.post('/auth/signup', userController.user_create);
 
+// This grabs the profile data. If we also use the query parameter ?allposts=true - It'll return even the 
+// unpublished posts
 router.get('/user/:id', userController.get_profile);
 
 router.get('/user/:id/posts', userController.get_user_posts);
