@@ -94,7 +94,7 @@ exports.user_create = [
 ]
 
 exports.get_profile = function (req, res, next) {
-
+//Check if the client wants all posts/comments or just published
 
     async.parallel({
         user: function (callback) {
@@ -121,18 +121,22 @@ exports.get_profile = function (req, res, next) {
                 // If the client only wants published posts, they can
                 // send a query that allows the db pull to return only
                 // published queries
-                if (req.query.allposts === 'true') { //Client wants all posts 
+                if (req.query.allposts) { //Client wants all posts 
                     Post.find({author: req.params.id}, ' title content date')
                     .exec((err, posts) => {
                         if (err) { return next(err) }
                         let result = {comments: results.comments, user: user, posts: posts}
                         res.status(200).json(result)
                     })
-                } else {        //Client only wants published posts
+                } else {        //Client only wants published posts and comments to published posts
                     Post.find({author: req.params.id, published: true})
                     .exec((err, posts) => {
                         if (err) { return next(err) }
-                        let result = {comments: results.comments, user: user, posts: posts}
+
+                        let filteredComments = results.comments.filter(comment => {
+                            return comment.post.published;
+                        })
+                        let result = {comments: filteredComments, user: user, posts: posts}
                         res.status(200).json(result)
                     })
                 }
