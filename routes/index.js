@@ -40,6 +40,7 @@ router.post('/auth/signup', userController.user_create);
 // unpublished posts and comments related to unpublished posts
 router.get('/user/:id', userController.get_profile);
 
+// Need to authenticate this
 router.get('/user/:id/posts', userController.get_user_posts);
 
 // Route for general authorization

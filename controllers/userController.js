@@ -156,6 +156,7 @@ exports.get_user_posts = function(req, res, next) {
     Post.find({author: req.params.id})
     .exec((err, posts) => {
         if (err) { return next(err) }
+        console.log(posts)
         res.status(200).json(posts)
     })
 }
