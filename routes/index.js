@@ -5,16 +5,11 @@ const commentController = require('../controllers/commentController');
 const userController = require('../controllers/userController');
 const passport = require('passport');
 
-// Route to retrieve all published posts
+// Route to retrieve all posts
 router.get('/posts', postController.posts_get);
-
-// Route to retrieve all posts: published and unpublished - user only
-router.get('/allposts', passport.authenticate('jwt', { session: false }), postController.posts_get_protected);
 
 //Route for creating a new post - must be user 
 router.post('/posts', passport.authenticate('jwt', { session: false }), postController.posts_create);
-
-
 
 // Routes for specific posts
 router.get('/posts/:postid', postController.posts_get_post);
@@ -41,7 +36,9 @@ router.post('/auth/login', userController.loginUser);
 // Route to create a new user
 router.post('/auth/signup', userController.user_create);
 
-router.get('/user/:id/profile', userController.get_profile);
+router.get('/user/:id', userController.get_profile);
+
+router.get('/user/:id/posts', userController.get_user_posts);
 
 // Route for general authorization
 router.get('/auth/userAuth', passport.authenticate('jwt', { session: false }),userController.authorizeUser);

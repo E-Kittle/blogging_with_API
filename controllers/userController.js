@@ -100,21 +100,53 @@ exports.get_profile = function (req, res, next) {
             User.findById(req.params.id, callback)
         },
         comments: function (callback) {
-            Comment.find({ 'author': req.params.id }, callback)
-        }, function(err, results) {
-            console.log(err.message)
+            Comment.find({ author: req.params.id }, callback)
+        }}, function(err, results) {
             if (err) { return next(err); }
-            console.log('made it')
-            console.log(results)
-            res.json(results)
+            
+            let user = {
+                id: results.user._id,
+                username: results.user.username,
+                email: results.user.email,
+                admin: results.user.admin
+            }
+
+            if (results.user.admin) {
+                // User is admin so they likely have posts
+                // If the client only wants published posts, they can
+                // send a query that allows the db pull to return only
+                // published queries
+                if (req.query.allposts === 'true') { //Client wants all posts 
+                    Post.find({author: req.params.id})
+                    .exec((err, posts) => {
+                        if (err) { return next(err) }
+                        let result = {comments: results.comments, user: user, posts: posts}
+                        res.status(200).json(result)
+                    })
+                } else {        //Client only wants published posts
+                    Post.find({author: req.params.id, published: true})
+                    .exec((err, posts) => {
+                        if (err) { return next(err) }
+                        let result = {comments: results.comments, user: user, posts: posts}
+                        res.status(200).json(result)
+                    })
+                }
+                
+            }
+            else {
+                let result = {comments: results.comments, user: user}
+                res.status(200).json(result);
+            }
 
         }
-    })
+    )
 
-
-    /*
-    1 - grab user data based on url
-    2 - Grab all comments
-    3 - If admin, grab posts
-    */
 };
+
+exports.get_user_posts = function(req, res, next) {
+    Post.find({author: req.params.id})
+    .exec((err, posts) => {
+        if (err) { return next(err) }
+        res.status(200).json(posts)
+    })
+}
