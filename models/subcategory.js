@@ -4,8 +4,8 @@ const Schema = mongoose.Schema;
 // Schema for the comments
 let SubCategorySchema = new Schema(
     {
-        subcat: {type: String, required: true},
-        cat: {type: Schema.Types.ObjectId, ref: 'Category', required: true}
+        subcategory: {type: String, required: true},
+        category: {type: Schema.Types.ObjectId, ref: 'Category', required: true}
     }
 )
 
