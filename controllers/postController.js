@@ -63,7 +63,9 @@ exports.posts_create = [
 exports.posts_get_post = function (req, res, next) {
 
     // First, check if the post exists
-    Post.findById(req.params.postid, function (err, post) {
+    Post.findById(req.params.postid)
+    .populate('author', 'username')
+    .exec(function (err, post) {
         if (post === undefined) {
             res.status(404).json({ message: 'No such post exists' })
         }

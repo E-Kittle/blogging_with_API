@@ -4,6 +4,7 @@ const { body, validationResult } = require('express-validator');
 // Gets all comments related to the postid from the database
 exports.comments_get = function(req, res, next) {
     Comment.find({post: req.params.postid})
+    .populate('author', 'username')
     .exec(function (err, comment_list) {
         if (err) { return next(err); }
 
