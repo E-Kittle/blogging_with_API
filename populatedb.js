@@ -1,7 +1,7 @@
 #! /usr/bin/env node
 
 // This script populates the db with test data
-console.log('This script populates test posts, comments, and an user');
+console.log('This script populates test posts, comments, categories, subcategories and users');
 
 // Get arguments passed on command line
 var userArgs = process.argv.slice(2);
@@ -31,16 +31,16 @@ const categories = [];
 const subcategories = [];
 
 // Function to create a new category
-function categoryCreate(title, cb) {
-    let category = new Category({ title });
+function categoryCreate(name, cb) {
+    let category = new Category({ name });
 
     category.save(function (err) {
         if (err) {
             cb(err, null);
             return;
         } else {
-            categories.push(user);
-            cb(null, user);
+            categories.push(category);
+            cb(null, category);
         }
     })
 }
@@ -68,15 +68,15 @@ function createCategory(cb) {
 
 // Function to create a new category
 function subCategoryCreate(title, category, cb) {
-    let subCategory = new SubCategory({ title, category });
+    let newSubCategory = new SubCategory({ subcategory:title, category });
 
-    subCategory.save(function (err) {
+    newSubCategory.save(function (err) {
         if (err) {
             cb(err, null);
             return;
         } else {
-            subcategories.push(user);
-            cb(null, user);
+            subcategories.push(newSubCategory);
+            cb(null, newSubCategory);
         }
     })
 }
@@ -110,7 +110,6 @@ function createSubCategory(cb) {
 // Function to create an user
 // user test data will be removed from the database in production
 function userCreate(username, password, email, admin, cb) {
-
     bcrypt.hash(password, 10, (err, hashedPassword) => {
         let userDetail = { username, password: hashedPassword, email, admin };
 
@@ -175,31 +174,31 @@ function postCreate(author, title, content, published, subcategory, cb) {
 function createPosts(cb) {
     async.series([
         function (callback) {
-            postCreate(users[0], 'Post1', 'Lots of content for post 1', true, subCategories[0], callback);
+            postCreate(users[0], 'Post1', 'Lots of content for post 1', true, subcategories[0], callback);
         },
         function (callback) {
-            postCreate(users[0], 'Post2', 'Lots of content for post 2', false, subCategories[1],callback);
+            postCreate(users[0], 'Post2', 'Lots of content for post 2', false, subcategories[1],callback);
         },
         function (callback) {
-            postCreate(users[2], 'Post3', 'Lots of content for post 3', true, subCategories[2], callback);
+            postCreate(users[2], 'Post3', 'Lots of content for post 3', true, subcategories[2], callback);
         },
         function (callback) {
-            postCreate(users[2], 'Post4', 'Lots of content for post 4', false, subCategories[1], callback);
+            postCreate(users[2], 'Post4', 'Lots of content for post 4', false, subcategories[1], callback);
         },
         function (callback) {
-            postCreate(users[2], 'Post5', 'Lots of content for post 5', true, subCategories[3], callback);
+            postCreate(users[2], 'Post5', 'Lots of content for post 5', true, subcategories[3], callback);
         },
         function (callback) {
-            postCreate(users[3], 'Post7', 'Lots of content for post 5', true, subCategories[4], callback);
+            postCreate(users[3], 'Post7', 'Lots of content for post 5', true, subcategories[4], callback);
         },
         function (callback) {
-            postCreate(users[3], 'Post10', 'Lots of content for post 5', true, subCategories[5], callback);
+            postCreate(users[3], 'Post10', 'Lots of content for post 5', true, subcategories[5], callback);
         },
         function (callback) {
-            postCreate(users[3], 'Post8', 'Lots of content for post 5', false, subCategories[1], callback);
+            postCreate(users[3], 'Post8', 'Lots of content for post 5', false, subcategories[1], callback);
         },
         function (callback) {
-            postCreate(users[0], 'Post9', 'Lots of content for post 5', true, subCategories[2], callback);
+            postCreate(users[0], 'Post9', 'Lots of content for post 5', true, subcategories[2], callback);
         },
     ],
         cb);
