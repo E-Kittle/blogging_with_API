@@ -172,7 +172,7 @@ exports.posts_edit_post = [
 
         // Ensure the original post exists
         Post.findById(req.params.postid, function (err, post) {
-
+            console.log(post)
             if (post === undefined) {       //If no such post, return a 404 error
                 res.status(404).json({ message: 'No post found' })
             }

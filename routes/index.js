@@ -6,24 +6,28 @@ const userController = require('../controllers/userController');
 const categoryController = require('../controllers/categoryController');
 const passport = require('passport');
 
+//Tomorrow
+// 2. Fix /posts/:postid route since it allows duplicate titles
+//      MAYBE! Post.findById is returning null
+// 3. Category appeared as null on a post - why
 
 /*ROUTES
     For 1-4 need to add ability to sort by date, and ability to limit number of posts per page
-1- .get /posts -> Grabs all published posts - 
-2- .get /categories -> Grabs all categories - used on homepage
-3. .get /posts/category/:id -> Grabs all posts for a specific category
-4. .get /posts/category/:id/subcategory/:subcatid -> Grabs all posts for a specific subcategory
-5. .get /posts/:id -> Grabs all data for specific post
-6. .post /posts -> Adds a new post
-7. .put /posts/:id -> Edits a post
-8. .DELETE /posts/:id -> Deletes a post
-9. .get /posts/:id/comments -> Displays all comments for post
-10. .post /posts/:id/comments -> Adds a comment
-11. .delete /posts/:id/comments/:commentId -> Deletes a comment
-12. .post /categories -> Adds a category
-13. .post /categories/subcategory -> Adds a subcategory
-14. .delete /categories/:id -> Deletes a category
-15. .delete /categories/:id/subcategory/:subcatId - >Deletes a subcategory
+D1- .get /posts -> Grabs all published posts - 
+D2- .get /categories -> Grabs all categories - used on homepage
+D3. .get /posts/category/:id -> Grabs all posts for a specific category
+D4. .get /posts/category/:id/subcategory/:subcatid -> Grabs all posts for a specific subcategory
+D5. .get /posts/:id -> Grabs all data for specific post
+D6. .post /posts -> Adds a new post
+D7. .put /posts/:id -> Edits a post
+D8. .DELETE /posts/:id -> Deletes a post
+D9. .get /posts/:id/comments -> Displays all comments for post
+D10. .post /posts/:id/comments -> Adds a comment
+D11. .delete /posts/:id/comments/:commentId -> Deletes a comment
+D12. .post /categories -> Adds a category
+D13. .post /categories/subcategory -> Adds a subcategory
+D14. .delete /categories/:id -> Deletes a category
+D15. .delete /categories/:id/subcategory/:subcatId - >Deletes a subcategory
 
 user auth
 1. .post /auth/login
@@ -39,9 +43,6 @@ profile
 
 
 // Route to retrieve all published posts 
-// !- need to allow for sorting- can do alphabetically or by release
-// date in the future - Or can we just do this client side????
-// That's probably best for now
 //TESTED
 router.get('/posts', postController.get_posts);
 
@@ -82,14 +83,6 @@ router.post('/posts/:postid/comments', commentController.comments_create);
 //TESTED
 router.delete('/posts/:postid/comments/:commentid', passport.authenticate('jwt', { session: false }), commentController.comment_delete);
 
-
-
-// 2- .get /categories -> Grabs all categories - used on homepage
-// 12. .post /categories -> Adds a category
-// 13. .post /categories/subcategory -> Adds a subcategory
-// 14. .delete /categories/:id -> Deletes a category
-// 15. .delete /categories/:id/subcategory/:subcatId - >Deletes a subcategory
-
 //Route to get all of the categories
 //TESTED
 router.get('/categories', categoryController.get_categories);
@@ -98,9 +91,14 @@ router.get('/categories', categoryController.get_categories);
 //TESTED
 router.post('/categories', passport.authenticate('jwt', { session: false }), categoryController.post_category);
 
+// Route to delete a category
+//TESTED
+router.delete('/categories/:id', passport.authenticate('jwt', { session: false }), categoryController.delete_category);
+
 // Route to add a new subcategory
 //TESTED
 router.post('/categories/:id/subcategory', passport.authenticate('jwt', { session: false }), categoryController.post_subcategory);
+
 
 // Route to delete a subcategory
 //TESTED
@@ -109,24 +107,25 @@ router.delete('/categories/:id/subcategory/:subcatid', passport.authenticate('jw
 
 
 // Routes for the user
+//TESTED
 router.post('/auth/login', userController.loginUser);
 
 // Route to create a new user
+//TESTED
 router.post('/auth/signup', userController.user_create);
 
-// This grabs the profile data. If we also use the query parameter ?allposts=true - It'll return even the 
-// unpublished posts and comments related to unpublished posts
-router.get('/user/:id', userController.get_profile);
+// This grabs the profile data. Only returns comments associated with published posts
+// and published posts (if the user has any) 
+//TESTED
+router.get('/user/:id', passport.authenticate('jwt', { session: false }), userController.get_profile);
 
-// Need to authenticate this 
-router.get('/user/:id/posts', userController.get_user_posts);
+// Route for admin user to see all posts, including unpublished posts
+//TESTED
+router.get('/user/:id/posts', passport.authenticate('jwt', { session: false }), userController.get_user_posts);
 
-// Route for general authorization
-router.get('/auth/userAuth', passport.authenticate('jwt', { session: false }),userController.authorizeUser);
-
-router.get('/auth/protected-test', passport.authenticate('jwt', { session: false }), (req, res) => {
-    res.end('Protected route reached')
-});
+// Route for general authorization- Just checks token
+//TESTED
+router.get('/auth/userAuth', passport.authenticate('jwt', { session: false }), userController.authorizeUser);
 
 // router.post('/user/sign-up', passport.authenticate('jwt', {session: false}), userController.user_create);  - Depreciated
 module.exports = router;

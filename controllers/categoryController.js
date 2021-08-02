@@ -94,10 +94,20 @@ exports.post_subcategory = [
 
 // Method to delete a category
 exports.delete_category = function (req, res, next) {
-    Category.find({}, function(err, categories) {
+
+    Post.find({category: req.params.id})
+    .exec(function(err, results) {
+
         if (err) { return next(err); }
-        else {
-            res.status(200).json({categories})
+        else if (results.length > 0) {
+            res.status(400).json({message: 'Please reassign the following posts before deleting category', results})
+        } else {
+            Category.findByIdAndDelete(req.params.id, function (err) {
+                if (err) { return next(err); }
+                else{
+                    res.status(200).json({message: 'Category deleted'})
+                }
+            })
         }
     })
 }

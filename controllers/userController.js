@@ -74,40 +74,50 @@ exports.user_create = [
         }
         // There are no errors, save the user
         else {
-            // Hash the password
-            bcrypt.hash(req.body.password, 10, (err, hashedPassword) => {
-                let userDetail = {
-                    username: req.body.username,
-                    password: hashedPassword,
-                    email: req.body.email,
-                    admin: req.body.admin
-                };
+            if (req.body.admin === undefined) {
+                res.status(400).json({ message: 'Admin status required' })
+            }
+            else {
+                // Hash the password
+                bcrypt.hash(req.body.password, 10, (err, hashedPassword) => {
+                    let userDetail = {
+                        username: req.body.username,
+                        password: hashedPassword,
+                        email: req.body.email,
+                        admin: req.body.admin
+                    };
 
-                let user = new User(userDetail);
-                user.save((err, result) => {
-                    if (err) { return next(err); }
-                    res.status(200).json({ 'Message': 'user Created' })
+                    let user = new User(userDetail);
+                    user.save((err, result) => {
+                        if (err === null) {
+                            res.status(200).json({ 'Message': 'user Created' })
+                        }
+                        else if (err.keyValue.username) {
+                            res.status(400).json({ message: "User already exists" })
+                        } else if (err) { return next(err); }
+                    });
                 });
-            });
+            }
         }
     }
 ]
 
 exports.get_profile = function (req, res, next) {
-//Check if the client wants all posts/comments or just published
+    //Check if the client wants all posts/comments or just published
 
     async.parallel({
         user: function (callback) {
             User.findById(req.params.id, callback)
         },
         comments: function (callback) {
-            Comment.find({ author: req.params.id},'_id comment date post').populate('post', 'title published').exec(callback)
-        }}, function(err, results) {
-            if (results.user === undefined || results.user === null) {
-                // No user found with that id
-                res.status(400).json({user: null, message: 'No user with provided id exists'})
-            } else{
-                
+            Comment.find({ author: req.params.id }, '_id comment date post').populate('post', 'title published').exec(callback)
+        }
+    }, function (err, results) {
+        if (results.user === undefined || results.user === null) {
+            // No user found with that id
+            res.status(400).json({ user: null, message: 'No user with provided id exists' })
+        } else {
+
             if (err) { return next(err); }
             let user = {
                 id: results.user._id,
@@ -117,46 +127,37 @@ exports.get_profile = function (req, res, next) {
             }
 
             if (results.user.admin) {
-                // User is admin so they likely have posts
-                // If the client only wants published posts, they can
-                // send a query that allows the db pull to return only
-                // published queries
-                if (req.query.allposts) { //Client wants all posts 
-                    Post.find({author: req.params.id}, ' title content date')
-                    .exec((err, posts) => {
-                        if (err) { return next(err) }
-                        let result = {comments: results.comments, user: user, posts: posts}
-                        res.status(200).json(result)
-                    })
-                } else {        //Client only wants published posts and comments to published posts
-                    Post.find({author: req.params.id, published: true})
+                Post.find({ author: req.params.id, published: true })
+                    .populate('category', 'name')
                     .exec((err, posts) => {
                         if (err) { return next(err) }
 
                         let filteredComments = results.comments.filter(comment => {
                             return comment.post.published;
                         })
-                        let result = {comments: filteredComments, user: user, posts: posts}
+                        let result = { comments: filteredComments, user: user, posts: posts }
                         res.status(200).json(result)
                     })
-                }
-                
+
             }
             else {
-                let result = {comments: results.comments, user: user}
+                let result = { comments: results.comments, user: user }
                 res.status(200).json(result);
             }
 
-        }}
+        }
+    }
     )
 
 };
 
-exports.get_user_posts = function(req, res, next) {
-    Post.find({author: req.params.id})
-    .exec((err, posts) => {
-        if (err) { return next(err) }
-        console.log(posts)
-        res.status(200).json(posts)
-    })
+exports.get_user_posts = function (req, res, next) {
+    Post.find({ author: req.params.id })
+        .exec((err, posts) => {
+            if (posts===undefined) {
+                res.status(400).json('User not found')
+            }
+            else if (err) { return next(err) }
+            res.status(200).json(posts)
+        })
 }
