@@ -12,7 +12,6 @@ const Post = require('./models/post');
 const Comment = require('./models/comment');
 const User = require('./models/user');
 const Category = require('./models/category');
-const SubCategory = require('./models/subcategory');
 const bcrypt = require('bcrypt');
 
 // Connect to database
@@ -28,11 +27,10 @@ const posts = [];
 const comments = [];
 const users = [];
 const categories = [];
-const subcategories = [];
 
 // Function to create a new category
-function categoryCreate(name, cb) {
-    let category = new Category({ name });
+function categoryCreate(name, subcategories, cb) {
+    let category = new Category({ name, subcategories });
 
     category.save(function (err) {
         if (err) {
@@ -49,23 +47,24 @@ function categoryCreate(name, cb) {
 function createCategory(cb) {
     async.series([
         function (callback) {
-            categoryCreate('Science', callback)
+            categoryCreate('Science', ['Biology', 'Botany', 'Astronomy'], callback)
         },
         function (callback) {
-            categoryCreate('History', callback)
+            categoryCreate('History', ['World War 1', 'Civil War'],callback)
                 },
         function (callback) {
-            categoryCreate('Technology', callback)
+            categoryCreate('Technology', ['Virtual Reality'],callback)
         },
         function (callback) {
-            categoryCreate('Pop Culture', callback)
+            categoryCreate('Pop Culture', ['Television'], callback)
         },
         function (callback) {
-            categoryCreate('Fitness', callback)
+            categoryCreate('Fitness', [], callback)
         }
     ], cb)
 }
 
+/*
 // Function to create a new category
 function subCategoryCreate(title, category, cb) {
     let newSubCategory = new SubCategory({ subcategory:title, category });
@@ -106,6 +105,7 @@ function createSubCategory(cb) {
         }
     ], cb)
 }
+*/
 
 // Function to create an user
 // user test data will be removed from the database in production
@@ -149,11 +149,11 @@ function createuser(cb) {
 }
 
 // Function to create a post
-function postCreate(author, title, content, published, subcategory, cb) {
+function postCreate(author, title, content, published, category, subcategory, cb) {
     let today = new Date();
     let date = today.toDateString();
 
-    postDetail = { author, title, content, date, published, subcategory };
+    postDetail = { author, title, content, date, published, category, subcategory };
 
     let post = new Post(postDetail);
 
@@ -174,31 +174,31 @@ function postCreate(author, title, content, published, subcategory, cb) {
 function createPosts(cb) {
     async.series([
         function (callback) {
-            postCreate(users[0], 'Post1', 'Lots of content for post 1', true, subcategories[0], callback);
+            postCreate(users[0], 'Post1', 'Lots of content on Astronomy', true, categories[0], categories[0].subcategories[2], callback);
         },
         function (callback) {
-            postCreate(users[0], 'Post2', 'Lots of content for post 2', false, subcategories[1],callback);
+            postCreate(users[0], 'Post2', 'Lots of content on History', false, categories[1], categories[1].subcategories[1], callback);
         },
         function (callback) {
-            postCreate(users[2], 'Post3', 'Lots of content for post 3', true, subcategories[2], callback);
+            postCreate(users[2], 'Post3', 'Lots of content on VR', true, categories[2], categories[2].subcategories[0], callback);
         },
         function (callback) {
-            postCreate(users[2], 'Post4', 'Lots of content for post 4', false, subcategories[1], callback);
+            postCreate(users[2], 'Post4', 'Lots of content on History', false, categories[1], categories[1].subcategories[1], callback);
         },
         function (callback) {
-            postCreate(users[2], 'Post5', 'Lots of content for post 5', true, subcategories[3], callback);
+            postCreate(users[2], 'Post5', 'Lots of content on Biology', true, categories[0], categories[0].subcategories[0], callback);
         },
         function (callback) {
-            postCreate(users[3], 'Post7', 'Lots of content for post 5', true, subcategories[4], callback);
+            postCreate(users[3], 'Post7', 'Lots of content on Botany', true, categories[0], categories[0].subcategories[1], callback);
         },
         function (callback) {
-            postCreate(users[3], 'Post10', 'Lots of content for post 5', true, subcategories[5], callback);
+            postCreate(users[3], 'Post10', 'Lots of content on TV shows', true, categories[3], categories[3].subcategories[0], callback);
         },
         function (callback) {
-            postCreate(users[3], 'Post8', 'Lots of content for post 5', false, subcategories[1], callback);
+            postCreate(users[3], 'Post8', 'Lots of content on the Civil War', false, categories[1], categories[1].subcategories[1], callback);
         },
         function (callback) {
-            postCreate(users[0], 'Post9', 'Lots of content for post 5', true, subcategories[2], callback);
+            postCreate(users[0], 'Post9', 'Lots of content on Biology', true, categories[0], categories[0].subcategories[0], callback);
         },
     ],
         cb);
@@ -286,7 +286,6 @@ function createComments(cb) {
 async.series([
     createuser,
     createCategory,
-    createSubCategory,
     createPosts,
     createComments
 ],

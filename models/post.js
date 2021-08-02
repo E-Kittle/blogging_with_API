@@ -9,7 +9,8 @@ let PostSchema = new Schema(
         content: {type: String, required: true},
         date: {type: Date, required: true},
         published: {type: Boolean, required: true},
-        subcategory: {type: Schema.Types.ObjectId, ref: 'SubCategory', required: true}
+        category: {type: Schema.Types.ObjectId, ref:'Category', required:true},
+        subcategory: {type:String, required: true}
     }
 )
 

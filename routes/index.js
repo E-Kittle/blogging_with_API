@@ -5,8 +5,60 @@ const commentController = require('../controllers/commentController');
 const userController = require('../controllers/userController');
 const passport = require('passport');
 
-// Route to retrieve all posts
+
+/*ROUTES
+    For 1-4 need to add ability to sort by date, and ability to limit number of posts per page
+1- .get /posts -> Grabs all published posts - 
+2- .get /categories -> Grabs all categories - used on homepage
+3. .get /posts/category/:id -> Grabs all posts for a specific category
+4. .get /posts/category/:id/subcategory/:subcatid -> Grabs all posts for a specific subcategory
+5. .get /posts/:id -> Grabs all data for specific post
+6. .post /posts -> Adds a new post
+7. .put /posts/:id -> Edits a post
+8. .DELETE /posts/:id -> Deletes a post
+9. .get /posts/:id/comments -> Displays all comments for post
+10. .post /posts/:id/comments -> Adds a comment
+11. .delete /posts/:id/comments/:commentId -> Deletes a comment
+12. .post /categories -> Adds a category
+13. .post /categories/subcategory -> Adds a subcategory
+14. .delete /categories/:id -> Deletes a category
+15. .delete /categories/:id/subcategory/:subcatId - >Deletes a subcategory
+
+user auth
+1. .post /auth/login
+2. .post /auth/signup
+3. .get /auth/userauth -> Temporarily used to authenticate token
+
+
+profile
+.get /user/:id -> Grabs profile data
+.get /user/:id/posts -> Grabs all posts for an admin user - This is for their 'manage posts' page 
+*/
+
+
+
+// 1. Route to retrieve all published posts
 router.get('/posts', postController.posts_get);
+
+
+// 2- .get /categories -> Grabs all categories - used on homepage
+// 3. .get /posts/category/:id -> Grabs all posts for a specific category
+// 4. .get /posts/category/:id/subcategory/:subcatid -> Grabs all posts for a specific subcategory
+// 5. .get /posts/:id -> Grabs all data for specific post
+// 6. .post /posts -> Adds a new post
+// 7. .put /posts/:id -> Edits a post
+// 8. .DELETE /posts/:id -> Deletes a post
+// 9. .get /posts/:id/comments -> Displays all comments for post
+// 10. .post /posts/:id/comments -> Adds a comment
+// 11. .delete /posts/:id/comments/:commentId -> Deletes a comment
+// 12. .post /categories -> Adds a category
+// 13. .post /categories/subcategory -> Adds a subcategory
+// 14. .delete /categories/:id -> Deletes a category
+// 15. .delete /categories/:id/subcategory/:subcatId - >Deletes a subcategory
+
+
+
+
 
 //Route for creating a new post - must be user 
 router.post('/posts', passport.authenticate('jwt', { session: false }), postController.posts_create);
@@ -40,7 +92,7 @@ router.post('/auth/signup', userController.user_create);
 // unpublished posts and comments related to unpublished posts
 router.get('/user/:id', userController.get_profile);
 
-// Need to authenticate this
+// Need to authenticate this 
 router.get('/user/:id/posts', userController.get_user_posts);
 
 // Route for general authorization

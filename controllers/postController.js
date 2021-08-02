@@ -1,10 +1,21 @@
 const Post = require('../models/post');
+const Category = require('../models/category');
 const { body, validationResult } = require('express-validator');
 
 
 // Function to get the published posts
 exports.posts_get = function (req, res, next) {
     // Grabs only published posts from the database
+    Post.find({published: true}).populate('Category', 'name')
+    .exec(function (err, post_list) {
+        if (err) { return next(err); }
+        else {      //Successful data grab
+            res.status(200).json(post_list);
+        }
+    })
+
+    /* - Temporarily keeping
+    This will grab all the posts, not just published posts from the db
     if (req.query.allposts === 'false') {
         Post.find({published: true})
         .exec(function (err, post_list) {
@@ -22,6 +33,7 @@ exports.posts_get = function (req, res, next) {
             }
         })
     }
+    */
 }
 
 // Function to create a new post - user only
