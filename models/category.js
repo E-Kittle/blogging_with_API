@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 // Schema for the comments
 let CategorySchema = new Schema(
     {
-        name: {type: String, required: true},
+        name: {type: String, required: true, unique: true},
         subcategories: [String]
     }
 )
