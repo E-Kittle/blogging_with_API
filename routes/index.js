@@ -6,9 +6,7 @@ const userController = require('../controllers/userController');
 const categoryController = require('../controllers/categoryController');
 const passport = require('passport');
 
-//Tomorrow
-// 2. Fix /posts/:postid route since it allows duplicate titles
-//      MAYBE! Post.findById is returning null
+
 // 3. Category appeared as null on a post - why
 
 /*ROUTES
@@ -56,14 +54,15 @@ router.get('/posts/category/:id/:subcatid', postController.get_posts_by_subcat)
 
 //Route for creating a new post - must be user 
 //TESTED - auth works
-router.post('/posts', passport.authenticate('jwt', { session: false }), postController.posts_create);
+// NEED TO ADD AUTH
+router.post('/posts', postController.posts_create);
 
 // Routes for specific posts
 //TESTED
 router.get('/posts/:postid', postController.posts_get_post);
 
 //Route for editting a post - Must be user
-//TESTED - Fails to catch a post title being changed to another title
+//TESTED 
 router.put('/posts/:postid', passport.authenticate('jwt', { session: false }), postController.posts_edit_post);
 
 //Route for deleting a post - must be user
