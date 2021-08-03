@@ -153,6 +153,7 @@ exports.get_profile = function (req, res, next) {
 
 exports.get_user_posts = function (req, res, next) {
     Post.find({ author: req.params.id })
+    .populate('category', 'name')
         .exec((err, posts) => {
             if (posts===undefined) {
                 res.status(400).json('User not found')

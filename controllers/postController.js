@@ -166,7 +166,6 @@ exports.posts_edit_post = [
     body('published').toBoolean(),
 
     (req, res, next) => {
-
         // Extract validation errors
         const errors = validationResult(req);
 
@@ -174,11 +173,10 @@ exports.posts_edit_post = [
         Post.findById(req.params.postid, function (err, post) {
             console.log(post)
             if (post === undefined) {       //If no such post, return a 404 error
-                res.status(404).json({ message: 'No post found' })
+                res.status(400).json({ message: 'No post found' })
             }
             // Forward error from findById to next middleware
             else if (err) { return next(err); }
-
             // Called if the post exists and no errors were found by findById
             else {
                 // If there were errors during validation, reject the submission and return the errors
@@ -227,7 +225,6 @@ exports.posts_edit_post = [
                                     subcategory: req.body.subcategory,
                                     _id: req.params.postid
                                 };
-
                                 Post.findByIdAndUpdate(req.params.postid, newPost, {}, function (err) {
                                     if (err) {
                                         if (err.keyValue.title === null) {
