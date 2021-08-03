@@ -29,10 +29,8 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
 
 // Middleware
-app.options('/api/posts', cors())
-app.use(cors({
-  origin: 'http://localhost:3000'
-}));
+app.options('*', cors());
+
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
