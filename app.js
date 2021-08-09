@@ -29,8 +29,8 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
 
 // Middleware
-// app.use(cors());
-app.options('*', cors());
+app.use(cors());
+// app.options('*', cors());
 // app.options('*', cors({
 //   origin: 'http://localhost:3000'
 // }))
