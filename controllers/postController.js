@@ -120,10 +120,15 @@ exports.posts_create = [
                                 subcategory: req.body.subcategory
                             }
                         ).save((err, result) => {
-                            if (err.keyValue.title) {
-                                res.status(500).json({message: 'title already exists'})
+                            if (err) { 
+                                if (err.keyValue.title) {
+                                    res.status(500).json({message: 'title already exists'})
+                                }
+                                else {
+                                    return next(err); 
+                                }
+                            
                             }
-                            else if (err) { return next(err); }
                             else { res.status(200).json(result); }
                         })
                     } else {
