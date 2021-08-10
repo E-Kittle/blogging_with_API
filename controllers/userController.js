@@ -37,6 +37,7 @@ exports.loginUser = function (req, res, next) {
 
                         // User data to send back to the frontend
                         const newUser = {
+                            id: user._id,
                             username: user.username,
                             email: user.email,
                             admin: user.admin
