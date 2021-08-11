@@ -9,7 +9,7 @@ const { body, validationResult } = require('express-validator');
 exports.get_posts = function (req, res, next) {
 
     // Grabs only published posts from the database
-    Post.find({ published: true }).populate('category', 'name')
+    Post.find({ published: true }).populate('category', 'name').populate('author', 'username')
         .exec(function (err, post_list) {
             if (err) { return next(err); }
             else {      //Successful data grab
