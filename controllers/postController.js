@@ -58,10 +58,7 @@ exports.get_posts_by_cat = function (req, res, next) {
 exports.get_posts_by_subcat = function (req, res, next) {
     Post.find({ published: true, subcategory: req.params.subcatid }).populate('category', 'name')
         .exec(function (err, post_list) {
-            if (post_list.length === 0) {
-                res.status(400).json({ message: 'Subcategory not found' })
-            }
-            else if (err) { return next(err); }
+            if (err) { return next(err); }
             else {      //Successful data grab
                 res.status(200).json(post_list);
             }
