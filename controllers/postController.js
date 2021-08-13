@@ -42,7 +42,7 @@ exports.get_posts = function (req, res, next) {
 
 // Grabs all published posts for a specific category
 exports.get_posts_by_cat = function (req, res, next) {
-    Post.find({ published: true, category: req.params.id }).populate('category', 'name')
+    Post.find({ published: true, category: req.params.id }).populate('category', 'name').populate('author', 'username')
         .exec(function (err, post_list) {
             if (post_list === undefined) {
                 res.status(400).json({ message: 'Category not found' })
@@ -56,7 +56,7 @@ exports.get_posts_by_cat = function (req, res, next) {
 
 // Grabs all published posts for a specific subcategory
 exports.get_posts_by_subcat = function (req, res, next) {
-    Post.find({ published: true, subcategory: req.params.subcatid }).populate('category', 'name')
+    Post.find({ published: true, subcategory: req.params.subcatid }).populate('category', 'name').populate('author', 'username')
         .exec(function (err, post_list) {
             if (err) { return next(err); }
             else {      //Successful data grab
