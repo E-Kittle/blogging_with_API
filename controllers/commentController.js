@@ -6,14 +6,16 @@ exports.comments_get = function (req, res, next) {
     Comment.find({ post: req.params.postid })
         .populate('author', 'username')
         .exec(function (err, comment_list) {
-            if (err) { return next(err); }
-
+            if (comment_list === undefined) {
+                res.status(400).json({message: 'invalid post id'})
+            }
             // There are no comments for the specific post so return an empty array
-            if (comment_list === null) {
+            else if (comment_list === null) {
                 comment_list = [];
                 res.status(200).json({ comments: comment_list, message: 'No comments for this blog post' });
             }
-
+            
+            else if (err) { return next(err); }
             // Successfully found comments, return to client
             else {
                 res.status(200).json({ comments: comment_list });
