@@ -54,9 +54,7 @@ router.get('/posts/category/:id', postController.get_posts_by_cat)
 router.get('/posts/category/:id/:subcatid', postController.get_posts_by_subcat)
 
 //Route for creating a new post - must be user 
-//TESTED - auth works
-// NEED TO ADD AUTH
-router.post('/posts', postController.posts_create);
+router.post('/posts', passport.authenticate('jwt', { session: false }), postController.posts_create);
 
 // Routes for specific posts
 //TESTED
